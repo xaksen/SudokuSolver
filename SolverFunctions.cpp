@@ -3,10 +3,10 @@
 #include "SolverFunctions.h"
 #include <iostream>
 
-std::array<multimap,9> box_define (std::array<int,81> su_in) {
+std::array<multimap,9> box_define (std::array<int,81> arr_in) {
     
     // Initialise output
-    std::array <multimap,9> big_array {};
+    std::array <multimap,9> mm_sol {};
     
     // For each box
     for (int i {0}; i <= 8; i++) {
@@ -40,7 +40,7 @@ std::array<multimap,9> box_define (std::array<int,81> su_in) {
         
         // Iterating over input in groups of three and emplacing these values into the temporary box
         for (int j {0}; j <= 2; j++) {
-            std::array<int,81>::iterator it1 = su_in.begin() + offset + 9*j;
+            std::array<int,81>::iterator it1 = arr_in.begin() + offset + 9*j;
             for (int k {0}; k<=2; k++) {
                 box_i.insert(std::pair<int,int>(box_index,*it1));
                 it1++;
@@ -49,11 +49,11 @@ std::array<multimap,9> box_define (std::array<int,81> su_in) {
         }
         
         // Emplace the corresponding box in the multimap with data from the temporary box
-        big_array.at(i) = box_i;
+        mm_sol.at(i) = box_i;
     }
-    return big_array;
+    return mm_sol;
 }
-std::array<multimap,9> set_possibilities (std::array<multimap,9> &big_array) {
+std::array<multimap,9> set_possibilities (std::array<multimap,9> &mm_sol) {
     
     // For each square in a box
     for (int i {0}; i <= 8; i++) {
@@ -62,8 +62,8 @@ std::array<multimap,9> set_possibilities (std::array<multimap,9> &big_array) {
         std::list<int> all_possibilities {1,2,3,4,5,6,7,8,9};
         
         // Iterating over box i and removing any pre-existing values from the possibilities
-        auto it = big_array.at(i).begin();
-        while (it != big_array.at(i).end()) {
+        auto it = mm_sol.at(i).begin();
+        while (it != mm_sol.at(i).end()) {
             if ((*it).second > 0) {
                 all_possibilities.remove((*it).second);
             }
@@ -71,28 +71,28 @@ std::array<multimap,9> set_possibilities (std::array<multimap,9> &big_array) {
         }
         
         // Iterating over box i and replacing any squares with 0 inside with all possibilities
-        it = big_array.at(i).begin();
-        while (it != big_array.at(i).end()) {
+        it = mm_sol.at(i).begin();
+        while (it != mm_sol.at(i).end()) {
             if ((*it).second == 0) {
                 auto erase_it = it++;
                 for (int x:all_possibilities) {
-                    big_array.at(i).emplace((*erase_it).first,x);
+                    mm_sol.at(i).emplace((*erase_it).first,x);
                 }
-                big_array.at(i).erase(erase_it);
+                mm_sol.at(i).erase(erase_it);
             }
             else {it++;}
         }
     }
     
-    return big_array;
+    return mm_sol;
 }
-void output_func (std::array<int,81> su_in) {
+void output_func (std::array<int,81> arr_in) {
     
     // Printing input for completeness
     std::cout << "\n       Problem       " << std::endl << std::endl;
     
     // Iterating over entire array
-    auto it = su_in.begin();
+    auto it = arr_in.begin();
     
     // For each row
     for (int i {1}; i <= 9; i++) {
@@ -115,25 +115,25 @@ void output_func (std::array<int,81> su_in) {
     }
     std::cout << std::endl;
 }
-void output_func (std::array<multimap,9> big_array ) {
+void output_func (std::array<multimap,9> mm_sol ) {
     
     // Printing solution
     std::cout << "      Solution       " << std::endl << std::endl;
     /* ~Test code~
-    multimap::iterator it = big_array.at(6).begin();
+    multimap::iterator it = mm_sol.at(6).begin();
     for (int i {0}; i <= 8; i++) {
         std::cout << (*it).second;
         it++;
     }
 
-    multimap::iterator it = big_array.at(6).begin();
+    multimap::iterator it = mm_sol.at(6).begin();
     while ((*it).first < 8) {
         std::cout << (*it).second;
         it++;
     }
 
-    multimap::iterator it = big_array.at(6).begin();
-    while (it!=big_array.at(6).end()) {
+    multimap::iterator it = mm_sol.at(6).begin();
+    while (it!=mm_sol.at(6).end()) {
         std::cout << (*it).second;
         it++;
     }
@@ -152,7 +152,7 @@ void output_func (std::array<multimap,9> big_array ) {
             for (int j {0}; j <= 2; j++) {
                 
                 // Initialise iterator at the start of the box
-                auto it = big_array.at(j+3*h).begin();
+                auto it = mm_sol.at(j+3*h).begin();
                 
                 // Iterate to intended key value in the box
                 while ((*it).first!=3*i) {it++;}
@@ -168,7 +168,7 @@ void output_func (std::array<multimap,9> big_array ) {
                     int temp = (*it).first;
                     
                     // Checking if the pair has a unique key value, if so print
-                    if (big_array.at(j+3*h).count(temp) > 1) {
+                    if (mm_sol.at(j+3*h).count(temp) > 1) {
                         std::cout << "-";
                         if (((*it).first+1)%3!=0 ) {std::cout << " ";}
                         while ((*it).first == temp) {it++;}
@@ -246,7 +246,7 @@ std::array<int,3> row_indicies (int i) {
     std::cerr << "Outside of bound indicies" << std::endl;
     return std::array<int,3> {0,0,0};
 }
-std::array<multimap,9> update_box (std::array<multimap,9> &big_array, int i) {
+std::array<multimap,9> update_box (std::array<multimap,9> &mm_sol, int i) {
     
     // Update box with updated information in surrounding boxes
     
@@ -264,21 +264,21 @@ std::array<multimap,9> update_box (std::array<multimap,9> &big_array, int i) {
         for (int index {0}; index <= 8; index++) {
             
             // Checking if value if finalised, if so add to impossible_vals
-            if (big_array.at(i).count(index) == 1) {
-                impossible_vals.push_back(big_array.at(i).find(index)->second);
+            if (mm_sol.at(i).count(index) == 1) {
+                impossible_vals.push_back(mm_sol.at(i).find(index)->second);
             }
         } 
         
         // Checking if key is not unique, if so then search
-        if (big_array.at(i).count(j) > 1) {
+        if (mm_sol.at(i).count(j) > 1) {
             
             // Check col for finalised values
             std::array<int,3> col_sqs {col_indicies (j)};
             for (int box:col_boxes) {
                 for (int sq:col_sqs) {
-                    if (big_array.at(box).count(sq) == 1) {
+                    if (mm_sol.at(box).count(sq) == 1) {
                         // Add finalised values to list of impossible values
-                        impossible_vals.push_back(big_array.at(box).find(sq)->second);
+                        impossible_vals.push_back(mm_sol.at(box).find(sq)->second);
                     }
                 }
             }
@@ -287,9 +287,9 @@ std::array<multimap,9> update_box (std::array<multimap,9> &big_array, int i) {
             std::array<int,3> row_sqs {row_indicies(j)};
             for (int box:row_boxes) {
                 for (int sq:row_sqs) {
-                    if (big_array.at(box).count(sq) == 1) {
+                    if (mm_sol.at(box).count(sq) == 1) {
                         // Add finalised values to list of impossible values
-                        impossible_vals.push_back(big_array.at(box).find(sq)->second);
+                        impossible_vals.push_back(mm_sol.at(box).find(sq)->second);
                     }
                 }
             }
@@ -299,7 +299,7 @@ std::array<multimap,9> update_box (std::array<multimap,9> &big_array, int i) {
             impossible_vals.unique();
             
             // Initialise iterator to first pair with key j
-            auto it = big_array.at(i).find(j);
+            auto it = mm_sol.at(i).find(j);
             
             // Noting key
             int temp {(*it).first};
@@ -311,7 +311,7 @@ std::array<multimap,9> update_box (std::array<multimap,9> &big_array, int i) {
                 // remove pair from multimap and value from impossible vals
                 if ((*it).second == impossible_vals.front()) {
                     auto erase_it = it++;
-                    big_array.at(i).erase(erase_it);
+                    mm_sol.at(i).erase(erase_it);
                     impossible_vals.pop_front();
                 } else if ((*it).second < impossible_vals.front()) {
                     // If pair value > impossible_vals.front this means that this is still a possible
@@ -332,16 +332,16 @@ std::array<multimap,9> update_box (std::array<multimap,9> &big_array, int i) {
             */
         }
     }
-    return big_array;
+    return mm_sol;
 }
-bool is_finished (std::array<multimap,9> big_array) {
+bool is_finished (std::array<multimap,9> mm_sol) {
     
     // Simple function to see if the solution is completed
     
     // For each box, check if 9 pairs
     for (int i {0}; i <= 8; i++) {
-        if (big_array.at(i).size() > 9) {return false;}
-        else if (big_array.at(i).size() < 9) {
+        if (mm_sol.at(i).size() > 9) {return false;}
+        else if (mm_sol.at(i).size() < 9) {
             // Error catch, should never read this code
             std::cerr << "Too many values removed - try debug at box " << i << std::endl;
             exit(0);

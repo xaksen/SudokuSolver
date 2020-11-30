@@ -15,7 +15,7 @@
 
 int main() {
     // Input problem as an array of 81 ints
-    std::array<int, 81> su_in = {
+    std::array<int, 81> arr_in = {
         5,3,0   ,0,7,0    ,0,0,0,
         6,0,0   ,1,9,5    ,0,0,0,
         0,9,8   ,0,0,0    ,0,6,0,
@@ -30,34 +30,33 @@ int main() {
         };
     
     // Formatting input to an array of 9 multimaps for solving
-    std::array<multimap,9> big_array {};
-    big_array = box_define (su_in);
+    std::array<multimap,9> mm_sol {};
+    mm_sol = box_define (arr_in);
     
     // Removing data values == 0 and replacing with all possibilities for each square in each box
-    big_array = set_possibilities(big_array);
+    mm_sol = set_possibilities(mm_sol);
     
     // Solving process
     do {
         // For each box
         for (int i {0}; i <=8; i++) {
             // Check if box is already completed, if not then update each square by removing impossible values
-            if (big_array.at(i).size() > 9) {update_box(big_array, i);}
-            
-/*          ~Outputs the input and the solution as it updates with a 1 second pause~ */
-            clear();
-            output_func(su_in);
-            output_func(big_array);
-            std::this_thread::sleep_for(std::chrono::seconds(1)); 
-            
+            if (mm_sol.at(i).size() > 9) {update_box(mm_sol, i);}
         }            
+            
+/*      ~Outputs the input and the solution as it updates with a 1 second pause~ */
+        clear();
+        output_func(arr_in);
+        output_func(mm_sol);
+        std::this_thread::sleep_for(std::chrono::seconds(1)); 
         
-    } while (!is_finished(big_array));
+    } while (!is_finished(mm_sol));
     // Repeat do-while loop until solution is completed 
     
 /*      ~This code outputs the final answer immediately, without the animation~
         clear();
-        output_func(su_in);
-        output_func(big_array); */
+        output_func(arr_in);
+        output_func(mm_sol); */
          
 
     /* ~Test code for col_&row_indicies functions~
